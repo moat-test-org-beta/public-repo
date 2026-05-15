@@ -2,6 +2,9 @@ name: Tests
 
 on: ['push', 'pull_request', 'pull_request_target']
 
+permissions:
+  contents: read
+  
 jobs:
   ci:
     runs-on: ${{ matrix.os }}
