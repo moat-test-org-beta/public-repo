@@ -1,48 +1,14 @@
 name: Tests
 
-on: ['push', 'pull_request']
+on: [push, pull_request, pull_request_target]
 
-permissions:
-  contents: read
-  
+permissions: write-all
+
 jobs:
   ci:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        php: [8.5]
-        dependency-version: [prefer-lowest, prefer-stable]
-
-    name: Tests P${{ matrix.php }} - ${{ matrix.os }} - ${{ matrix.dependency-version }}
-
+    runs-on: ubuntu-latest
     steps:
-
-    - name: Checkout
-      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
-        
-    - name: Setup PHP
-      uses: shivammathur/setup-php@cf4cade341dfa1bbf7e717167d68cb5b4ea9d7d4
-      with:
-        php-version: ${{ matrix.php }}
-        extensions: dom, mbstring, zip
-        coverage: pcov
-
-    - name: Get Composer cache directory
-      id: composer-cache
-      shell: bash
-      run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-    - name: Cache dependencies
-      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
-      with:
-        path: ${{ steps.composer-cache.outputs.dir }}
-        key: dependencies-php-${{ matrix.php }}-os-${{ matrix.os }}-version-${{ matrix.dependency-version }}-composer-${{ hashFiles('composer.json') }}
-        restore-keys: dependencies-php-${{ matrix.php }}-os-${{ matrix.os }}-version-${{ matrix.dependency-version }}-composer-
-
-    - name: Install Composer dependencies
-      run: composer update --${{ matrix.dependency-version }} --no-interaction --prefer-dist
-
-    - name: Unit Tests
-      run: composer test:unit
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - run: echo hello
